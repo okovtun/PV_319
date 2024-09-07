@@ -2,6 +2,13 @@
 https://www.youtube.com/playlist?list=PLeqyOOqxeiIMoZmXHC4xATi6sucdKobIg
 
 TODO:
+1. На базе односвязного списка создать Stack;
+2. На базе двусвязного списка создать Queue;
+3. Почитать:
+	https://legacy.cplusplus.com/reference/stl/
+4. *Выяснить в чем разница между оператором [] и методом at();
+
+DONE:
 1. Проверить то что мы сделали на типах данных 'double' и 'std::string';
 2. От ветки 'TemplatedList2' создать ветку 'SeparatedList2', и в этой ветке
    вынести класс 'List' в отдельные файлы;
