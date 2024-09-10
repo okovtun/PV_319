@@ -2,6 +2,14 @@
 https://www.youtube.com/playlist?list=PLeqyOOqxeiIMoZmXHC4xATi6sucdKobIg
 
 TODO:
+1. Вставить значение в вектор по указанному индексу;
+2. Удалить значение из вектора по указанному индексу;
+	https://legacy.cplusplus.com/reference/vector/vector/
+3. Вставить значение в список по указанному индексу;
+4. Удалить значение из списка по указанному индексу;
+	https://legacy.cplusplus.com/reference/list/list/
+
+DONE:
 1. На базе односвязного списка создать Stack;
 2. На базе двусвязного списка создать Queue;
 3. Почитать:
