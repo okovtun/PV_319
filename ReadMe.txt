@@ -2,6 +2,14 @@
 https://www.youtube.com/playlist?list=PLeqyOOqxeiIMoZmXHC4xATi6sucdKobIg
 
 TODO:
+1. Загрузить базу в файл;
+2. Прочитать базу из файла;
+
+DONE:
+Решить задачу №1:
+	https://github.com/okovtun/PV_319/blob/master/STL/GAI%20DZ_PS_C%2B%2B_nedelya_09.pdf
+
+DONE:
 1. Вставить значение в вектор по указанному индексу;
 2. Удалить значение из вектора по указанному индексу;
 	https://legacy.cplusplus.com/reference/vector/vector/
