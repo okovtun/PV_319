@@ -68,6 +68,11 @@ public:
 		strftime(formatted, SIZE, "%R %e.%m.%Y", &time);
 		return formatted;
 	}
+	const time_t get_timestamp()const
+	{
+		tm copy = time;
+		return mktime(&copy);
+	}
 
 	/*void set_license_plate(const std::string& licence_plate)
 	{
@@ -137,6 +142,11 @@ std::ostream& operator<<(std::ostream& os, const Crime& obj)
 {
 	return os << obj.get_time() << ":\t" << obj.get_place() << " - " << obj.get_violation();
 }
+std::ofstream& operator<<(std::ofstream& os, const Crime& obj)
+{
+	os << obj.get_violation_id() << " " << obj.get_timestamp() << " " << obj.get_place();
+	return os;
+}
 
 void print(const std::map<std::string, std::list<Crime>>& base);
 void save(const std::map<std::string, std::list<Crime>>& base, const std::string& filename);
@@ -160,7 +170,7 @@ void main()
 void print(const std::map<std::string, std::list<Crime>>& base)
 {
 	cout << delimiter << endl;
-	for(std::map<std::string, std::list<Crime>>::const_iterator map_it = base.begin();
+	for (std::map<std::string, std::list<Crime>>::const_iterator map_it = base.begin();
 		map_it != base.end();
 		++map_it)
 	{
@@ -176,17 +186,20 @@ void print(const std::map<std::string, std::list<Crime>>& base)
 void save(const std::map<std::string, std::list<Crime>>& base, const std::string& filename)
 {
 	std::ofstream fout(filename);
-	fout << delimiter << endl;
+	//fout << delimiter << endl;
 	for (std::map<std::string, std::list<Crime>>::const_iterator map_it = base.begin();
 		map_it != base.end();
 		++map_it)
 	{
-		fout << map_it->first << ":\n";
+		fout << map_it->first << ":\t";
 		for (std::list<Crime>::const_iterator it = map_it->second.begin(); it != map_it->second.end(); ++it)
 		{
-			fout << "\t" << *it << endl;
+			fout << *it << ",";
 		}
-		fout << delimiter << endl;
+		fout.seekp(-1, std::ios::cur);
+		//Метод seekp(offset, direction) задает позицию курсора записи (p - put)
+		//-1 смещение на один символ обратно, std::ios::cur - показывает что смещение производится от текущей позиции курсора.
+		fout << ";\n";
 	}
 	fout.close();
 	std::string command = "notepad " + filename;
