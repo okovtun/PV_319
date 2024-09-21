@@ -3,6 +3,7 @@
 #include<iostream>
 #include<fstream>
 #include<string>
+#include<sstream>
 #include<conio.h>
 #include<map>
 #include<list>
@@ -17,6 +18,7 @@ using std::endl;
 
 const std::map<int, std::string> VIOLATIONS =
 {
+	{0, "N/A"},
 	{1, "Ремень безопасности"},
 	{2, "Парковка в неположенном месте"},
 	{3, "Пересечение сплошной"},
@@ -113,13 +115,17 @@ public:
 
 		//this->time = time;
 	}
+	void set_timestamp(time_t timestamp)
+	{
+		time = *localtime(&timestamp);
+	}
 
 	//					Constructors:
-	Crime
+	explicit Crime	//Баз 'explicit' выдает ошибку в 'ofstream operator'
 	(
-		int violation_id,
-		const std::string& place,
-		const std::string& time
+		int violation_id = 0,
+		const std::string& place = "Place",
+		const std::string& time = "00:00 01.01.2000"
 	)
 	{
 		this->time = {};
@@ -147,9 +153,26 @@ std::ofstream& operator<<(std::ofstream& os, const Crime& obj)
 	os << obj.get_violation_id() << " " << obj.get_timestamp() << " " << obj.get_place();
 	return os;
 }
+std::istream& operator>>(std::istream& is, Crime& obj)
+{
+	int id;
+	time_t timestamp;
+	std::string place;
+	is >> id >> timestamp;
+	std::getline(is, place, ',');
+	is.ignore();
+	obj.set_violation_id(id);
+	obj.set_timestamp(timestamp);
+	obj.set_place(place);
+	return is;
+}
 
 void print(const std::map<std::string, std::list<Crime>>& base);
 void save(const std::map<std::string, std::list<Crime>>& base, const std::string& filename);
+std::map<std::string, std::list<Crime>> load(const std::string& filename);
+
+//#define SAVE_CHECK
+#define LOAD_CHECK
 
 void main()
 {
@@ -157,6 +180,7 @@ void main()
 	/*Crime crime(1, "ул. Ленина", "18:10 1.09.2024");
 	cout << crime << endl;*/
 
+#ifdef SAVE_CHECK
 	std::map<std::string, std::list<Crime>> base =
 	{
 		{"a777bb", {Crime(1, "ул. Ленина", "18:10 1.09.2024"), Crime(2,"пл. Свободы", "12:25 20.08.2024")}},
@@ -165,6 +189,13 @@ void main()
 	};
 	print(base);
 	save(base, "base.txt");
+#endif // SAVE_CHECK
+
+#ifdef LOAD_CHECK
+	std::map<std::string, std::list<Crime>> base = load("base.txt");
+	print(base);
+#endif // LOAD_CHECK
+
 }
 
 void print(const std::map<std::string, std::list<Crime>>& base)
@@ -181,8 +212,8 @@ void print(const std::map<std::string, std::list<Crime>>& base)
 		}
 		cout << delimiter << endl;
 	}
+	cout << "Количество номеров в базе: " << base.size() << endl;
 }
-
 void save(const std::map<std::string, std::list<Crime>>& base, const std::string& filename)
 {
 	std::ofstream fout(filename);
@@ -196,12 +227,62 @@ void save(const std::map<std::string, std::list<Crime>>& base, const std::string
 		{
 			fout << *it << ",";
 		}
-		fout.seekp(-1, std::ios::cur);
+		//fout.seekp(-1, std::ios::cur);
 		//Метод seekp(offset, direction) задает позицию курсора записи (p - put)
 		//-1 смещение на один символ обратно, std::ios::cur - показывает что смещение производится от текущей позиции курсора.
-		fout << ";\n";
+		//fout << ";\n";
+		fout << endl;
 	}
 	fout.close();
 	std::string command = "notepad " + filename;
 	system(command.c_str());
+}
+std::map<std::string, std::list<Crime>> load(const std::string& filename)
+{
+	std::map<std::string, std::list<Crime>> base;
+	std::ifstream fin(filename);
+	if (fin.is_open())
+	{
+		while (!fin.eof())
+		{
+			std::string licence_plate;
+			std::getline(fin, licence_plate, ':');
+			//if (licence_plate.empty())continue;
+			licence_plate.erase(0, licence_plate.find_first_not_of('\n'));
+			fin.ignore();	//:
+
+			std::string crimes;
+			std::getline(fin, crimes);
+			char* sz_buffer = new char[crimes.size() + 1]{};
+			strcpy(sz_buffer, crimes.c_str());
+			char delimiters[] = ",";
+			Crime crime;// (0, "place", "00:00 01.01.2000");
+			for (char* pch = strtok(sz_buffer, delimiters); pch; pch = strtok(NULL, delimiters))
+			{
+				std::cout << pch << "\t";
+				//std::string s_crime(pch);
+				std::stringstream ss_crime(pch, std::ios_base::in | std::ios_base::out);
+				//Crime crime(0, "place", "00:00 01.01.2000");	//При создании этого объекта локально в цикле 'for',
+																//он нарушает работу функции strtok(), поэтому объект создается перед циклом;
+				//Crime crime; //ситуация такая же как и в предыдущем случае.
+				ss_crime >> crime;
+				base[licence_plate].push_back(crime);
+			}
+			cout << endl;
+			/*std::string licence_plate;
+			std::getline(fin, licence_plate, ':');
+			fin.ignore();
+			Crime crime(0, "place", "time");
+			fin >> crime;
+			base[licence_plate].push_back(crime);*/
+
+			delete[] sz_buffer;
+		}
+		fin.close();
+	}
+	else
+	{
+		std::cerr << "Error: file not found" << endl;
+	}
+	return base;
 }
