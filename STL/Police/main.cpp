@@ -1,5 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #pragma warning (disable: 4326)
+#include<Windows.h>
 #include<iostream>
 #include<fstream>
 #include<string>
@@ -15,6 +16,30 @@ using std::endl;
 
 #define tab "\t"
 #define delimiter "\n---------------------------------------------------------------------------\n"
+
+#define Enter		13
+#define Escape		27
+#define UP_ARROW	72
+#define DOWN_ARROW	80
+
+//const char* MENU_ITEMS[] =
+//{
+//	"1. Загрузить базу из файла",
+//	"2. Сохранить базу в файл",
+//	"3. Вывести базу на экран",
+//	"4. Вывести информацию по номеру",
+//	"5. Добавить нарушение",
+//};
+//const int MENU_SIZE = sizeof(MENU_ITEMS) / sizeof(MENU_ITEMS[0]);
+
+const std::map<int, std::string>MENU_ITEMS =
+{
+	{1, "Загрузить базу из файла"},
+	{2, "Сохранить базу в файл"},
+	{3, "Вывести базу на экран"},
+	{5, "Вывести информацию по номеру"},
+	{4, "Добавить нарушение"},
+};
 
 const std::map<int, std::string> VIOLATIONS =
 {
@@ -167,12 +192,13 @@ std::istream& operator>>(std::istream& is, Crime& obj)
 	return is;
 }
 
+int menu();
 void print(const std::map<std::string, std::list<Crime>>& base);
 void save(const std::map<std::string, std::list<Crime>>& base, const std::string& filename);
 std::map<std::string, std::list<Crime>> load(const std::string& filename);
 
 //#define SAVE_CHECK
-#define LOAD_CHECK
+//#define LOAD_CHECK
 
 void main()
 {
@@ -196,6 +222,53 @@ void main()
 	print(base);
 #endif // LOAD_CHECK
 
+	std::map<std::string, std::list<Crime>> base = load("base.txt");
+	do
+	{
+		switch (menu())
+		{
+		case 0: return;
+		case 1: base = load("base.txt");	break;
+		case 2: save(base, "base.txt");		break;
+		case 3: print(base);				break;
+		case 4: cout << "Скоро будет" << endl; break;
+		case 5: cout << "Скоро будет" << endl; break;
+		}
+	} while (true);
+}
+int menu()
+{
+	int selected_item = 1;
+	char key;
+	do
+	{
+		system("CLS");
+		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+		for (int i = 1; i <= MENU_ITEMS.size(); i++)
+		{
+			cout << (i == selected_item ? "[" : " ");
+			cout << i << ". ";
+			cout.width(32);
+			cout << std::left;
+			if (i == selected_item)SetConsoleTextAttribute(hConsole, 0x70);
+			cout << MENU_ITEMS.at(i);
+			SetConsoleTextAttribute(hConsole, 0x07);
+			cout << (i == selected_item ? "  ]" : " ");
+			cout << endl;
+		}
+		key = _getch();
+		//cout << (int)key << endl;
+		switch (key)
+		{
+		case UP_ARROW:	 /*if (selected_item > 1)*/selected_item--; break;
+		case DOWN_ARROW: /*if (selected_item < MENU_ITEMS.size())*/selected_item++; break;
+		case Enter:		 return selected_item;
+		case Escape:	 return 0;
+		}
+		if (selected_item == MENU_ITEMS.size() + 1)selected_item = 1;
+		if (selected_item == 0)selected_item = MENU_ITEMS.size();
+	} while (key != Escape);
+	return 0;
 }
 
 void print(const std::map<std::string, std::list<Crime>>& base)
@@ -213,6 +286,7 @@ void print(const std::map<std::string, std::list<Crime>>& base)
 		cout << delimiter << endl;
 	}
 	cout << "Количество номеров в базе: " << base.size() << endl;
+	system("PAUSE");
 }
 void save(const std::map<std::string, std::list<Crime>>& base, const std::string& filename)
 {

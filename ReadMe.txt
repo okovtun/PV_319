@@ -2,6 +2,9 @@
 https://www.youtube.com/playlist?list=PLeqyOOqxeiIMoZmXHC4xATi6sucdKobIg
 
 TODO:
+Реализовать пункты меню;
+
+DONE:
 1. Загрузить базу в файл;
 2. Прочитать базу из файла;
 
