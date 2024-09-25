@@ -2,7 +2,8 @@
 https://www.youtube.com/playlist?list=PLeqyOOqxeiIMoZmXHC4xATi6sucdKobIg
 
 TODO:
-Реализовать пункты меню;
+1. Реализовать пункты меню;
+2. При добавлении записи, нарушение так же должно выбираться из меню;
 
 DONE:
 1. Загрузить базу в файл;

@@ -222,6 +222,13 @@ void main()
 	print(base);
 #endif // LOAD_CHECK
 
+	std::list<int> list = { 3,5,8,13,21 };
+	for (int i = 0; i < list.size(); i++)
+	{
+		cout << list[i] << tab;
+	}
+	cout << endl;
+
 	std::map<std::string, std::list<Crime>> base = load("base.txt");
 	do
 	{
